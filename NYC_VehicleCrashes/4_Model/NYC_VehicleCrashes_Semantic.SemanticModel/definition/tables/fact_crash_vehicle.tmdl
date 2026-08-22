@@ -1,0 +1,95 @@
+table fact_crash_vehicle
+	lineageTag: b8540bca-cde8-408b-ac4f-0a67761442f5
+	sourceLineageTag: [dbo].[fact_crash_vehicle]
+
+	/// Vehicles involved in the filtered crashes — one row per vehicle per collision.
+	measure 'Total Vehicles Involved' = COUNTROWS ( fact_crash_vehicle )
+		formatString: #,0
+
+	/// Reported occupants across involved vehicles. Trustworthy only because of the outlier cap applied in 44ea207 — raw source values inflated this ~888x.
+	measure 'Total Occupants' = SUM ( fact_crash_vehicle[vehicle_occupants] )
+		formatString: #,0
+
+	/// Vehicles carrying any reported occupant count, including a genuine zero. Denominator for Average Occupants per Vehicle. Unreported vehicles are BLANK in the source, not 0, so blankness — not a > 0 test — is what separates missing from measured; 480,156 reported zeros are real unoccupied vehicles, 81.8% of them Parked.
+	measure 'Vehicles with Occupant Data' = CALCULATE ( [Total Vehicles Involved], KEEPFILTERS ( NOT ISBLANK ( fact_crash_vehicle[vehicle_occupants] ) ) )
+		formatString: #,0
+
+	/// Share of involved vehicles that report an occupant count at all. Roughly 40% of source rows are blank, so read every occupancy measure against this.
+	measure 'Occupant Data Coverage %' = DIVIDE ( [Vehicles with Occupant Data], [Total Vehicles Involved] )
+		formatString: 0.0%
+
+	/// Mean occupants per vehicle across vehicles that report a count, counting genuine zeros as data. Dividing by all vehicles instead returns ~0.7, because ~40% of source rows report no occupant count at all and averaging those in understates the true figure. Depends on the same occupant cap as Total Occupants.
+	measure 'Average Occupants per Vehicle' = DIVIDE ( [Total Occupants], [Vehicles with Occupant Data] )
+		formatString: #,0.00
+
+	/// Mean vehicles involved per collision in the current filter context.
+	measure 'Vehicles per Crash' = DIVIDE ( [Total Vehicles Involved], DISTINCTCOUNT ( fact_crash_vehicle[collision_key] ) )
+		formatString: #,0.00
+
+	column fact_crash_vehicle_id
+		dataType: int64
+		formatString: 0
+		lineageTag: a9e8cce1-8754-4cc1-9fed-c7e4b78e8720
+		sourceLineageTag: fact_crash_vehicle_id
+		summarizeBy: none
+		sourceColumn: fact_crash_vehicle_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column collision_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 6fcff260-b52a-4e2c-b6b7-32ede9063045
+		sourceLineageTag: collision_key
+		summarizeBy: none
+		sourceColumn: collision_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column vehicle_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 42dfc810-ba53-4163-882b-dca49a787914
+		sourceLineageTag: vehicle_key
+		summarizeBy: none
+		sourceColumn: vehicle_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column damage_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 0af7ff52-5747-4cbe-8e74-6cfb81d7247e
+		sourceLineageTag: damage_key
+		summarizeBy: none
+		sourceColumn: damage_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column vehicle_occupants
+		dataType: int64
+		formatString: 0
+		lineageTag: cc43c4c4-e5d3-48df-a0aa-9aa8472ab6cf
+		sourceLineageTag: vehicle_occupants
+		summarizeBy: sum
+		sourceColumn: vehicle_occupants
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		lineageTag: e3a7c9f1-2b6d-4e8a-91c5-7d4f0a8b3e2c
+		sourceLineageTag: date_key
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_crash_vehicle = entity
+		mode: directLake
+		source
+			entityName: fact_crash_vehicle
+			schemaName: dbo
+			expressionSource: 'DirectLake - NYC_VehicleCrashes_Warehouse'
+

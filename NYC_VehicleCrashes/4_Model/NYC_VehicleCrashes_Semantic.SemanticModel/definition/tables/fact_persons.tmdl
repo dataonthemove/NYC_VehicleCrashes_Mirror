@@ -1,0 +1,101 @@
+table fact_persons
+	lineageTag: ddcad6ca-fcd3-4c8c-b6ff-c1ea920aa761
+	sourceLineageTag: [dbo].[fact_persons]
+
+	/// People involved in the filtered crashes, at person grain — one row per person per collision.
+	measure 'Total Persons Involved' = COUNTROWS ( fact_persons )
+		formatString: #,0
+
+	/// People flagged as injured at person grain. Compare with Persons Injured, which is the crash-level roll-up.
+	measure 'Injured Persons' = CALCULATE ( [Total Persons Involved], KEEPFILTERS ( fact_persons[is_injured] = TRUE ) )
+		formatString: #,0
+
+	/// People flagged as killed at person grain.
+	measure 'Killed Persons' = CALCULATE ( [Total Persons Involved], KEEPFILTERS ( fact_persons[is_killed] = TRUE ) )
+		formatString: #,0
+
+	/// Share of involved people who were injured.
+	measure 'Person Injury Rate' = DIVIDE ( [Injured Persons], [Total Persons Involved] )
+		formatString: 0.0%
+
+	/// Mean reported age of involved people. Blank ages are excluded, not treated as zero.
+	measure 'Average Person Age' = AVERAGE ( fact_persons[person_age] )
+		formatString: #,0.0
+
+	column fact_person_id
+		dataType: int64
+		formatString: 0
+		lineageTag: dfec960c-6f9d-45d6-a57b-b016e5a4a324
+		sourceLineageTag: fact_person_id
+		summarizeBy: none
+		sourceColumn: fact_person_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column collision_key
+		dataType: int64
+		formatString: 0
+		lineageTag: cab2661e-ec77-41f5-9112-bbc8de11a2b2
+		sourceLineageTag: collision_key
+		summarizeBy: none
+		sourceColumn: collision_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column person_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 3fe004bb-3d44-496d-9097-fc3234e12e77
+		sourceLineageTag: person_key
+		summarizeBy: none
+		sourceColumn: person_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column person_age
+		dataType: int64
+		formatString: 0
+		lineageTag: 459bee3b-933a-4497-924c-076ec9a384e7
+		sourceLineageTag: person_age
+		summarizeBy: average
+		sourceColumn: person_age
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_injured
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: c51acfe0-10a2-4425-8dfb-eff5bfd5265c
+		sourceLineageTag: is_injured
+		summarizeBy: none
+		sourceColumn: is_injured
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_killed
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 817ceabf-5644-4a8d-b8ca-be59b221145e
+		sourceLineageTag: is_killed
+		summarizeBy: none
+		sourceColumn: is_killed
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		lineageTag: b6f2a1b4-6f0d-4a3c-9d1e-8a5c2e7f9b3a
+		sourceLineageTag: date_key
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_persons = entity
+		mode: directLake
+		source
+			entityName: fact_persons
+			schemaName: dbo
+			expressionSource: 'DirectLake - NYC_VehicleCrashes_Warehouse'
+
