@@ -9,30 +9,7 @@
 Statuses: **OPEN** · **BLOCKED** · **DONE** (kept briefly for context, then deleted).
 
 ---
-
-## 1. Lakehouse CDC and Warehouse star load are not connected — OPEN, decision needed
-
-`pl_cdc_NYC_Crashes` lands data in the **Lakehouse Delta tables only**. The Warehouse
-dimensional load (`etl.usp_load_*`) is not part of the pipeline and currently runs only by
-executing the `3_Transform` notebooks by hand. So after every CDC run the star schema and
-the semantic model are stale until someone remembers to run 12 notebooks in the right order.
-
-For a portfolio build this is the most visible architectural gap after the missing measure
-layer — the pipeline stops halfway through the medallion.
-
-**Options:**
-
-- Extend `pl_cdc_NYC_Crashes` with Script activities calling each `usp_load_*` in dependency
-  order, gated on the watermark update. Keeps one pipeline.
-- Build a second pipeline (`pl_load_warehouse`) and chain it via Invoke Pipeline. Cleaner
-  separation, and lets the star load be rerun without re-ingesting.
-
-Either way the order matters: dims → `dim_factor_group` → facts → bridge, with
-`RefreshSemanticModel` last.
-
----
-
-## 2. NYC Open Data app token is committed in cleartext — OPEN
+## 1. NYC Open Data app token is committed in cleartext — OPEN
 
 `2_Ingest/pl_cdc_NYC_Crashes.DataPipeline/pipeline-content.json` embeds token.
 Issue resolved, removed token from code. 
