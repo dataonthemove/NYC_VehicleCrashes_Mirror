@@ -37,18 +37,6 @@ Either way the order matters: dims → `dim_factor_group` → facts → bridge, 
 `2_Ingest/pl_cdc_NYC_Crashes.DataPipeline/pipeline-content.json` embeds token.
 Issue resolved, removed token from code. 
 
-
-**Options, cheapest first:**
-
-- Drop the header entirely. The unauthenticated Socrata limit is generally adequate for
-  this CDC volume. Costs nothing, removes the problem.
-- Move it to a pipeline parameter with a default supplied at runtime.
-- Move it to Azure Key Vault and reference it via a Web activity.
-
-Rotating the token does not fix the committed history; only stopping its use does.
-
----
-
 ---
 
 ## Recently closed
