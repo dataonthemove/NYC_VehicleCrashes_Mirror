@@ -34,14 +34,9 @@ Either way the order matters: dims → `dim_factor_group` → facts → bridge, 
 
 ## 2. NYC Open Data app token is committed in cleartext — OPEN
 
-`2_Ingest/pl_cdc_NYC_Crashes.DataPipeline/pipeline-content.json` embeds
-`X-App-Token: W1wHO8uCRL6zDplGACRU0Vn5l` in all three Copy source `additionalHeaders`
-blocks. It is in the repo and in git history.
+`2_Ingest/pl_cdc_NYC_Crashes.DataPipeline/pipeline-content.json` embeds token.
+Issue resolved, removed token from code. 
 
-Low severity — a NYC Open Data app token only raises an anonymous rate limit; it grants
-no write access and no access to anything non-public. But it is a credential in version
-control, which is the wrong shape for a portfolio repo that is meant to demonstrate good
-practice.
 
 **Options, cheapest first:**
 
