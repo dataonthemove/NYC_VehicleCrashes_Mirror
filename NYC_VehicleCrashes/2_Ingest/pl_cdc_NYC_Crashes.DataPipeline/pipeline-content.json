@@ -132,7 +132,7 @@
             "storeSettings": {
               "type": "HttpReadSettings",
               "requestMethod": "GET",
-              "additionalHeaders": "X-App-Token:W1wHO8uCRL6zDplGACRU0Vn5l",
+              "additionalHeaders": "####HiddenToken####",
               "requestTimeout": ""
             },
             "datasetSettings": {
@@ -235,7 +235,7 @@
             "storeSettings": {
               "type": "HttpReadSettings",
               "requestMethod": "GET",
-              "additionalHeaders": "X-App-Token:W1wHO8uCRL6zDplGACRU0Vn5l",
+              "additionalHeaders": "####HiddenToken####",
               "requestTimeout": ""
             },
             "datasetSettings": {
@@ -330,7 +330,7 @@
             "storeSettings": {
               "type": "HttpReadSettings",
               "requestMethod": "GET",
-              "additionalHeaders": "X-App-Token:W1wHO8uCRL6zDplGACRU0Vn5l",
+              "additionalHeaders": "####HiddenToken####",
               "requestTimeout": ""
             },
             "datasetSettings": {
