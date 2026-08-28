@@ -1,6 +1,6 @@
 # NYC Motor Vehicle Collisions — Microsoft Fabric
 
-Portfolio copy of an end-to-end analytics build on NYC Open Data collision records
+Portfolio copy (Active Repo in Azure DevOps) of an end-to-end analytics build on NYC Open Data collision records
 (~2.3M crashes, ~6M persons, ~4.5M vehicles). Primary development happens in Azure DevOps;
 this mirror is published for demonstration.
 
